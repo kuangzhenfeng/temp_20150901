@@ -8,17 +8,26 @@
 namespace neural_network {
     
 /**
- * @brief 神经元基类
+ * @brief 激活函数类型枚举
+ */
+enum class ActivationType {
+    SIGMOID,
+    TANH,
+    RELU
+};
+
+/**
+ * @brief 神经元类（深度学习版本）
  * 
- * 这个类表示一个基本的神经元，包含输入、输出和激活函数等基本属性
+ * 这个类表示深度学习中的神经元节点，包含权重、偏置、激活函数等属性
  */
 class Neuron {
 public:
     /**
      * @brief 构造函数
-     * @param id 神经元唯一标识符
+     * @param numInputs 输入连接数
      */
-    explicit Neuron(int id);
+    explicit Neuron(size_t numInputs);
     
     /**
      * @brief 析构函数
@@ -26,52 +35,102 @@ public:
     virtual ~Neuron() = default;
     
     /**
-     * @brief 获取神经元ID
-     * @return 神经元ID
+     * @brief 前向传播计算输出
+     * @param inputs 输入值向量
+     * @return 输出值
      */
-    int getId() const;
+    double forward(const std::vector<double>& inputs);
     
     /**
-     * @brief 添加输入信号
-     * @param signal 输入信号值
+     * @brief 设置激活函数类型
+     * @param type 激活函数类型
      */
-    void addInputSignal(double signal);
+    void setActivationFunction(ActivationType type);
     
     /**
-     * @brief 计算输出信号
-     * @return 输出信号值
-     */
-    virtual double computeOutput();
-    
-    /**
-     * @brief 清除输入信号
-     */
-    void clearInputSignals();
-    
-    /**
-     * @brief 设置激活函数
+     * @brief 设置自定义激活函数
      * @param activation_func 激活函数
      */
     void setActivationFunction(std::function<double(double)> activation_func);
     
     /**
-     * @brief 获取当前膜电位
-     * @return 膜电位值
+     * @brief 获取权重
+     * @return 权重向量
      */
-    double getMembranePotential() const;
+    const std::vector<double>& getWeights() const;
     
     /**
-     * @brief 设置膜电位
-     * @param potential 膜电位值
+     * @brief 设置权重
+     * @param weights 新的权重向量
      */
-    void setMembranePotential(double potential);
+    void setWeights(const std::vector<double>& weights);
     
+    /**
+     * @brief 获取偏置
+     * @return 偏置值
+     */
+    double getBias() const;
+    
+    /**
+     * @brief 设置偏置
+     * @param bias 新的偏置值
+     */
+    void setBias(double bias);
+    
+    /**
+     * @brief 获取权重梯度
+     * @return 权重梯度向量
+     */
+    const std::vector<double>& getWeightGradients() const;
+    
+    /**
+     * @brief 获取偏置梯度
+     * @return 偏置梯度值
+     */
+    double getBiasGradient() const;
+    
+    /**
+     * @brief 设置梯度值
+     * @param weightGradients 权重梯度向量
+     * @param biasGradient 偏置梯度值
+     */
+    void setGradients(const std::vector<double>& weightGradients, double biasGradient);
+    
+    /**
+     * @brief 更新权重和偏置
+     * @param learningRate 学习率
+     */
+    void updateWeights(double learningRate);
+    
+    /**
+     * @brief 获取最近一次的输出值
+     * @return 输出值
+     */
+    double getOutput() const;
+    
+    /**
+     * @brief 计算激活函数的导数
+     * @param output 输出值
+     * @return 导数值
+     */
+    double computeActivationDerivative(double output) const;
+
 protected:
-    int id_;                                    ///< 神经元唯一标识符
-    std::vector<double> input_signals_;        ///< 输入信号列表
-    double membrane_potential_;                ///< 膜电位
-    double threshold_;                         ///< 激活阈值
+    std::vector<double> weights_;              ///< 连接权重
+    double bias_;                              ///< 偏置项
     std::function<double(double)> activation_function_; ///< 激活函数
+    ActivationType activation_type_;           ///< 激活函数类型
+    
+    // 用于反向传播的梯度信息
+    std::vector<double> weight_gradients_;     ///< 权重梯度
+    double bias_gradient_;                     ///< 偏置梯度
+    double output_;                            ///< 最近一次的输出值
+    
+    /**
+     * @brief 初始化指定类型的激活函数
+     * @param type 激活函数类型
+     */
+    void initializeActivationFunction(ActivationType type);
 };
 
 } // namespace neural_network
