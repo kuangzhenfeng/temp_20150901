@@ -73,5 +73,40 @@ int main() {
                   << "输出: " << output[0] << std::endl;
     }
     
+    // 保存模型
+    std::cout << "\n保存模型到文件..." << std::endl;
+    if (network.saveModel("xor_model.dat")) {
+        std::cout << "模型保存成功!" << std::endl;
+    } else {
+        std::cout << "模型保存失败!" << std::endl;
+    }
+    
+    // 创建一个新的网络并加载模型
+    std::cout << "\n创建新网络并加载模型..." << std::endl;
+    neural_network::Network loadedNetwork;
+    
+    // 添加相同结构的层
+    auto loadedHiddenLayer = std::make_shared<neural_network::Layer>(4, 2);
+    loadedNetwork.addLayer(loadedHiddenLayer);
+    
+    auto loadedOutputLayer = std::make_shared<neural_network::Layer>(1, 4);
+    loadedNetwork.addLayer(loadedOutputLayer);
+    
+    // 加载模型
+    if (loadedNetwork.loadModel("xor_model.dat")) {
+        std::cout << "模型加载成功!" << std::endl;
+        
+        // 测试加载的模型
+        std::cout << "\n加载模型后的输出:" << std::endl;
+        for (size_t i = 0; i < inputs.size(); i++) {
+            auto output = loadedNetwork.forward(inputs[i]);
+            std::cout << "输入: [" << inputs[i][0] << ", " << inputs[i][1] << "] "
+                      << "目标: " << targets[i][0] << " "
+                      << "输出: " << output[0] << std::endl;
+        }
+    } else {
+        std::cout << "模型加载失败!" << std::endl;
+    }
+    
     return 0;
 }

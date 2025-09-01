@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 #include "../neuron/neuron.h"
 
 namespace neural_network {
@@ -75,6 +76,8 @@ private:
     std::vector<std::shared_ptr<Neuron>> neurons_; ///< 层中的神经元
     std::vector<double> last_inputs_;              ///< 最近一次的输入
     std::vector<double> last_outputs_;             ///< 最近一次的输出
+    
+    friend class Network;
 };
 
 } // namespace neural_network

@@ -33,37 +33,11 @@ add_library(${PROJECT_NAME} ${SOURCES})
 add_executable(${PROJECT_NAME}_exec src/main.cpp)
 target_link_libraries(${PROJECT_NAME}_exec ${PROJECT_NAME})
 
-# 创建示例程序
-add_executable(xor_example examples/xor_example.cpp)
-target_link_libraries(xor_example ${PROJECT_NAME})
-
-add_executable(digit_recognition examples/digit_recognition.cpp)
-target_link_libraries(digit_recognition ${PROJECT_NAME})
-
-# 创建测试程序
-add_executable(test_neuron tests/test_neuron.cpp)
-target_link_libraries(test_neuron ${PROJECT_NAME})
-
-add_executable(test_network tests/test_network.cpp)
-target_link_libraries(test_network ${PROJECT_NAME})
-
 # 设置输出目录
 set_target_properties(${PROJECT_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 )
 set_target_properties(${PROJECT_NAME}_exec PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-set_target_properties(xor_example PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-set_target_properties(digit_recognition PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-set_target_properties(test_neuron PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-set_target_properties(test_network PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 

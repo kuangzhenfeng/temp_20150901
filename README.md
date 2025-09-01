@@ -1,100 +1,71 @@
 # 深度学习神经网络框架
 
-这是一个使用C++17编写的深度学习神经网络框架。该项目实现了标准的前馈神经网络，支持多层结构、反向传播训练算法等深度学习核心功能。
+## 项目简介
 
-## 项目特点
+这是一个使用C++17编写的高性能神经网络框架，旨在提供一个可扩展、高性能的神经网络模拟平台，支持基础研究和教学演示。
 
-- 使用现代C++17标准编写
-- 实现标准的前馈神经网络
-- 支持多层网络结构
-- 实现完整的反向传播训练算法
-- 可扩展的架构设计
-- 支持不同类型的激活函数和损失函数
+## 主要功能
+
+- 神经元信号处理
+- 多层网络结构管理
+- 激活函数支持（Sigmoid、Tanh、ReLU）
+- 网络训练与模式识别
+- 模型保存和加载
+
+## 技术特性
+
+- 使用现代C++17标准
+- 模块化设计：神经元、网络层、网络分别封装
+- 支持前向传播和反向传播算法
+- 支持多种激活函数和损失函数
+- 支持模型持久化
 
 ## 项目结构
 
 ```
-src/              # 源代码目录
-  ├── neuron/     # 神经元模块
-  │   ├── neuron.h
-  │   └── neuron.cpp
-  ├── network/    # 网络结构模块
-  │   ├── layer.h
-  │   ├── layer.cpp
-  │   ├── network.h
-  │   └── network.cpp
-tests/            # 测试代码
-examples/         # 示例代码
-scripts/          # 构建和运行脚本
+.
+├── examples           # 示例程序
+│   ├── xor_example.cpp       # XOR问题示例
+│   └── digit_recognition.cpp # 数字识别示例
+├── scripts            # 构建和运行脚本
+│   ├── build.sh       # 构建脚本
+│   └── run.sh         # 运行脚本
+├── src                # 源代码
+│   ├── network        # 网络模块
+│   │   ├── layer.cpp
+│   │   ├── layer.h
+│   │   ├── network.cpp
+│   │   └── network.h
+│   ├── neuron         # 神经元模块
+│   │   ├── neuron.cpp
+│   │   └── neuron.h
+│   └── main.cpp       # 主程序
+├── tests              # 单元测试
+│   ├── test_network.cpp
+│   └── test_neuron.cpp
+├── CMakeLists.txt     # CMake配置文件
+└── README.md
 ```
 
-## 构建说明
+## 核心组件
 
-项目使用CMake构建系统，要求C++17支持。
+### Neuron类
+- 包含权重、偏置等属性
+- 实现前向传播计算方法
+- 支持多种激活函数（Sigmoid、Tanh、ReLU）
+- 包含梯度和权重更新机制
 
-### 方法1：使用构建脚本（推荐）
+### Layer类
+- 管理神经元集合
+- 实现层级别的前向传播方法
+- 存储输入输出以支持反向传播
 
-```bash
-# 构建项目
-./scripts/build.sh
-```
-
-### 方法2：手动构建
-
-```bash
-# 创建构建目录
-mkdir build
-cd build
-
-# 配置项目
-cmake ..
-
-# 编译项目
-make
-```
-
-## 运行说明
-
-### 方法1：使用运行脚本（推荐）
-
-```bash
-# 查看可用选项
-./scripts/run.sh
-
-# 运行主程序
-./scripts/run.sh main
-
-# 运行XOR示例
-./scripts/run.sh xor
-
-# 运行手写数字识别示例
-./scripts/run.sh digit
-
-# 运行所有测试
-./scripts/run.sh all-tests
-
-# 清理构建目录
-./scripts/run.sh clean
-```
-
-### 方法2：手动运行
-
-```bash
-# 运行主程序
-./bin/NeuralNetwork_exec
-
-# 运行XOR示例
-./bin/xor_example
-
-# 运行手写数字识别示例
-./bin/digit_recognition
-
-# 运行神经元测试
-./bin/test_neuron_exec
-
-# 运行网络测试
-./bin/test_network_exec
-```
+### Network类
+- 管理网络层
+- 实现前向传播和训练方法
+- 支持标准算法：前向传播、反向传播
+- 支持多种损失函数（均方误差、交叉熵）
+- 支持模型保存和加载
 
 ## 核心组件
 
@@ -113,81 +84,47 @@ make
 - 支持多种损失函数（均方误差、交叉熵）
 - 支持权重更新机制
 
-## 使用示例
+## 构建和运行
 
-### 基本用法
-
-```cpp
-#include "network/network.h"
-#include "network/layer.h"
-#include "neuron/neuron.h"
-
-// 创建网络
-neural_network::Network network;
-
-// 添加隐藏层（3个神经元，每个神经元2个输入）
-auto hiddenLayer = std::make_shared<neural_network::Layer>(3, 2);
-network.addLayer(hiddenLayer);
-
-// 添加输出层（1个神经元，3个输入）
-auto outputLayer = std::make_shared<neural_network::Layer>(1, 3);
-network.addLayer(outputLayer);
-
-// 前向传播
-std::vector<double> inputs = {0.5, 0.3};
-std::vector<double> outputs = network.forward(inputs);
-
-// 训练网络
-std::vector<double> targets = {1.0};
-network.train(inputs, targets, 0.01);
-```
-
-### XOR问题示例
+### 构建项目
 
 ```bash
-# 编译后运行XOR示例
-./bin/xor_example
+# 使用构建脚本
+./scripts/build.sh
+
+# 或者手动构建
+mkdir build
+cd build
+cmake ..
+make
 ```
 
-该示例演示了如何使用神经网络解决XOR问题，包含以下步骤：
-1. 创建多层神经网络
-2. 准备XOR训练数据
-3. 训练网络
-4. 验证训练结果
-
-### 手写数字识别示例
+### 运行示例
 
 ```bash
-# 编译后运行数字识别示例
-./bin/digit_recognition
-```
+# 运行XOR示例
+./build/bin/xor_example
 
-该示例演示了如何使用神经网络进行简单的手写数字识别：
-1. 创建深层神经网络
-2. 使用简单的3x3像素数字数据集
-3. 训练网络识别数字0和1
-4. 评估识别准确率
+# 运行数字识别示例
+./build/bin/digit_recognition
 
-## 扩展功能
-
-框架设计支持以下扩展：
-
-1. 实现更多类型的激活函数（如LeakyReLU、ELU等）
-2. 添加更多优化算法（如Adam、RMSprop等）
-3. 支持更多损失函数
-4. 实现正则化技术（如Dropout、L1/L2正则化等）
-5. 添加网络保存和加载功能
-6. 支持卷积层和池化层（CNN）
-7. 支持循环神经网络（RNN、LSTM等）
-
-## 测试
-
-项目包含单元测试程序，可以验证各个组件的功能：
-
-```bash
 # 运行神经元测试
-./bin/test_neuron_exec
+./build/bin/test_neuron
 
 # 运行网络测试
-./bin/test_network_exec
+./build/bin/test_network
 ```
+
+## 重构改进
+
+本项目经过重构，主要改进包括：
+
+1. 修复了CMake配置中的重复目标定义问题
+2. 完善了反向传播算法的实现
+3. 增加了模型保存和加载功能
+4. 提高了代码质量和可维护性
+5. 增强了示例程序的功能
+
+## 许可证
+
+本项目为开源项目，可用于学习和研究目的。

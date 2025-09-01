@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <string>
+#include <fstream>
 #include "../neuron/neuron.h"
 #include "layer.h"
 
@@ -68,6 +70,20 @@ public:
      * @param type 损失函数类型
      */
     void setLossFunctionType(LossFunctionType type);
+    
+    /**
+     * @brief 保存网络模型到文件
+     * @param filename 文件名
+     * @return 是否保存成功
+     */
+    bool saveModel(const std::string& filename) const;
+    
+    /**
+     * @brief 从文件加载网络模型
+     * @param filename 文件名
+     * @return 是否加载成功
+     */
+    bool loadModel(const std::string& filename);
 
 private:
     std::vector<std::shared_ptr<Layer>> layers_;

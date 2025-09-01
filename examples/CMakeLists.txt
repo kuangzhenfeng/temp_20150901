@@ -25,10 +25,11 @@ target_link_libraries(digit_recognition ${PROJECT_NAME})
 set_target_properties(xor_example PROPERTIES 
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
 set_target_properties(digit_recognition PROPERTIES 
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
-
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )

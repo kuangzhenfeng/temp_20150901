@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <cassert>
+#include <sstream>
 
 namespace neural_network {
 
@@ -36,17 +37,7 @@ void Network::train(const std::vector<double>& inputs, const std::vector<double>
 void Network::backpropagate(const std::vector<double>& targets, double learningRate) {
     if (layers_.empty()) return;
     
-    // 存储每层的输出值，用于反向传播计算
-    std::vector<std::vector<double>> layer_outputs(layers_.size());
-    std::vector<std::vector<double>> layer_inputs(layers_.size());
-    
-    // 获取每层的输入和输出
-    // 注意：这需要修改Layer类以存储最近的输入和输出
-    for (size_t i = 0; i < layers_.size(); ++i) {
-        // 这里简化处理，实际实现需要Layer类支持获取最近的输入和输出
-    }
-    
-    // 计算输出层误差
+    // 从最后一层获取输出
     std::vector<double> outputs;
     auto output_neurons = layers_.back()->getNeurons();
     outputs.reserve(output_neurons.size());
@@ -54,6 +45,7 @@ void Network::backpropagate(const std::vector<double>& targets, double learningR
         outputs.push_back(neuron->getOutput());
     }
     
+    // 计算输出层误差
     std::vector<double> output_errors = computeOutputLayerErrors(outputs, targets);
     
     // 从输出层开始反向传播误差
@@ -63,6 +55,7 @@ void Network::backpropagate(const std::vector<double>& targets, double learningR
     for (int i = layers_.size() - 1; i >= 0; --i) {
         auto layer = layers_[i];
         auto neurons = layer->getNeurons();
+        const std::vector<double>& layer_inputs = layer->getLastInputs();
         
         // 计算当前层的梯度
         std::vector<std::vector<double>> weight_gradients(neurons.size());
@@ -82,12 +75,10 @@ void Network::backpropagate(const std::vector<double>& targets, double learningR
             double error_term = errors[j] * derivative;
             bias_gradients[j] = error_term;
             
-            // 注意：这里需要知道进入该神经元的输入值
-            // 为简化，我们假设有一个方法可以获取这些输入
+            // 计算权重梯度
             weight_gradients[j].resize(neuron->getWeights().size());
-            // 简化的权重梯度计算
             for (size_t k = 0; k < weight_gradients[j].size(); k++) {
-                weight_gradients[j][k] = error_term; // 简化处理
+                weight_gradients[j][k] = error_term * layer_inputs[k];
             }
             
             // 传播误差到前一层
@@ -181,6 +172,85 @@ std::shared_ptr<Layer> Network::getLayer(size_t index) const {
 
 void Network::setLossFunctionType(LossFunctionType type) {
     loss_function_type_ = type;
+}
+
+bool Network::saveModel(const std::string& filename) const {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    // 写入网络结构信息
+    file << layers_.size() << std::endl;
+    
+    // 写入每层的信息
+    for (const auto& layer : layers_) {
+        auto neurons = layer->getNeurons();
+        file << neurons.size() << " " << neurons[0]->getWeights().size() << std::endl;
+        
+        // 写入每个神经元的信息
+        for (const auto& neuron : neurons) {
+            // 写入偏置
+            file << neuron->getBias() << std::endl;
+            
+            // 写入权重
+            const auto& weights = neuron->getWeights();
+            for (size_t k = 0; k < weights.size(); k++) {
+                file << weights[k];
+                if (k < weights.size() - 1) {
+                    file << " ";
+                }
+            }
+            file << std::endl;
+        }
+    }
+    
+    file.close();
+    return true;
+}
+
+bool Network::loadModel(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    // 读取网络结构信息
+    size_t layerCount;
+    file >> layerCount;
+    
+    // 清空现有层
+    layers_.clear();
+    
+    // 读取每层的信息
+    for (size_t i = 0; i < layerCount; i++) {
+        size_t neuronCount, inputCount;
+        file >> neuronCount >> inputCount;
+        
+        // 创建层
+        auto layer = std::make_shared<Layer>(neuronCount, inputCount);
+        auto neurons = layer->getNeurons();
+        
+        // 读取每个神经元的信息
+        for (size_t j = 0; j < neuronCount; j++) {
+            // 读取偏置
+            double bias;
+            file >> bias;
+            neurons[j]->setBias(bias);
+            
+            // 读取权重
+            std::vector<double> weights(inputCount);
+            for (size_t k = 0; k < inputCount; k++) {
+                file >> weights[k];
+            }
+            neurons[j]->setWeights(weights);
+        }
+        
+        layers_.push_back(layer);
+    }
+    
+    file.close();
+    return true;
 }
 
 } // namespace neural_network
